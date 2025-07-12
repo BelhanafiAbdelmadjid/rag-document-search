@@ -73,7 +73,10 @@ POST /add_document
 Content-Type: application/json
 
 {
-    "content": "Your document content here"
+    "content": [
+      "Your document chunk1...",
+      "Your document chunk2..."
+    ]
 }
 ```
 
