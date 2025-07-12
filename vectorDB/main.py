@@ -5,6 +5,7 @@ from pgvector.sqlalchemy import Vector
 from dotenv import load_dotenv
 import os
 import numpy as np
+from sqlalchemy import func
 
 Base = declarative_base()
 
@@ -12,7 +13,7 @@ class Chunk(Base):
     __tablename__ = 'chunks'
     id = Column(Integer, primary_key=True, autoincrement=True)
     content = Column(Text, nullable=False)
-    embedding = Column(Vector(384))  # Adjust dimension based on your embedding model
+    embedding = Column(Vector(384))  
 
 class VectorDB:
     def __init__(self):
@@ -36,14 +37,24 @@ class VectorDB:
         finally:
             session.close()
     
-    def search(self, query_embedding: np.ndarray, top_k=5):
+    def search(self, query_embedding: np.ndarray, top_k=5, threshold=0.06):
         """Retrieve top_k most similar chunks based on cosine similarity"""
         session = self.Session()
         try:
-            results = session.query(Chunk).order_by(
-                Chunk.embedding.cosine_distance(query_embedding)
-            ).limit(top_k).all()
-            return results
+            results = session.query(
+                Chunk,
+                Chunk.embedding.cosine_distance(query_embedding).label("distance")
+            ).order_by("distance").limit(top_k).all()
+            
+            filtered = [
+                (r[0], r[1]) for r in results if r[1] < threshold
+            ]
+            print("filtered",filtered)
+            if not filtered:
+                print("No results found within the threshold.")
+                    
+            
+            return filtered
         except Exception as e:
             print("Error searching embeddings:", e)
             return []
@@ -52,9 +63,6 @@ class VectorDB:
 
 if __name__ == "__main__":
     db = VectorDB()
-    
-    # dummy_embedding = np.random.rand(384).tolist()
-    # db.add_chunk("This is a test chunk for LangChain.", dummy_embedding)
     
     query_embedding = np.random.rand(384).tolist()
     results = db.search(query_embedding, top_k=1)

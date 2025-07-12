@@ -41,7 +41,7 @@ class Embedding:
 if __name__ == "__main__":
     embedding_model = Embedding()
     
-    text = """LangChain is an open-source framework that simplifies building applications powered by large language models (LLMs)."""
+    text = input("Enter text to embed: ")
     vector = embedding_model.embed(text)
 
     print("Embedding vector shape:", vector.shape)

@@ -17,8 +17,6 @@ class LLM:
         ### Question:
     """ 
     promptTail = """
-        What is LangChain mainly used for?
-
         ### Answer:
     """
     def __init__(self):
@@ -73,9 +71,9 @@ class LLM:
 
 if __name__ == "__main__":
     llm = LLM()
-    
-    context = """LangChain is an open-source framework that simplifies building applications powered by large language models (LLMs). It provides tools to connect LLMs with external data sources, build chains of prompts and actions, and integrate retrieval-augmented generation (RAG) into applications. Developers use LangChain to create chatbots, knowledge assistants, and other AI apps that require combining LLM capabilities with private data."""
-    question = "What is LangChain mainly used for?"
+
+    context = input("Enter context: ")
+    question = input("Enter question: ")
 
     answer = llm.generate_response(context, question)
 
